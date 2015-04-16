@@ -3,4 +3,7 @@ Final Project for CS460
 
 Configuration Dependencies:\n
 	speedtestcli\n
-	A file called results.json
+	pyplot\n
+	numpy\n
+	A file called results.json\n
+
