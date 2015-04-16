@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
+
 import sys
 from optparse import OptionParser #For passing args
 from subprocess import * #Making system calls
 from time import *
 import json
 import os
+
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 #TODO:
@@ -28,9 +32,13 @@ def main():
 	(options, args) = parser.parse_args()
 
 
+
+
+
+
 	#set args
-	duration = options.duration
-	freq = options.freq
+	duration = float(options.duration)
+	freq = float(options.freq)
 	path = options.pathname
 
 
@@ -40,30 +48,48 @@ def main():
 	if duration == 0:
 		number_of_runs = 1
 	else:
-		number_of_runs = (int(duration) * 60) / int(freq)
+		number_of_runs = int((duration * 60) / freq)
+
 
 	output_file = path + "/current_test"
 	args1 = "--bytes"
 	args2 = "--simple"
-	# args = "-h" 
+
+	# process_worker = os.fork()
+	# if process_worker != 0:
+	# 	print("Executing scan on PID: ", process_worker)
+	# 	finish_time = time() + (duration * 60 * 60)
+	# 	print_time = strftime('%H:%M, %Y-%m-%d', localtime(finish_time))
+	# 	print("Approximate time scan will finish: ", print_time)
+	# 	exit(0)
+
+	print("Executing scan on PID: ", os.getpid())
+	finish_time = time() + (duration * 60 * 60)
+	print_time = strftime('%H:%M, %Y-%m-%d', localtime(finish_time))
+	print("Approximate time scan will finish: ", print_time)
 
 	while(curr_run < number_of_runs):
+		before_time = time()
+
 		# Run test command and place into output file
-		# test_cmd = ["speedtest-cli", args1, args2]
-		# with open(output_file, "w") as outfile:
-		# 	call(test_cmd, stdout=outfile)
+		test_cmd = ["speedtest-cli", args1, args2]
+		with open(output_file, "w") as outfile:
+			call(test_cmd, stdout=outfile)
 
 
+		#Open correct files 
 		curr_file = open(output_file, "r")
-		result_file = open("results.json", "r+")
+		result_file = open("results.json", "rb+")
 
 		curr_input = curr_file.read()
 		
+		#Extract the correct information
 		timestamp = strftime("%m/%d/%y::%H:%M:%S",localtime())
 		curr_ping = curr_input.split("Ping: ")[1].split("Download")[0].split(" ms")[0]
 		curr_down = curr_input.split("Download: ")[1].split("Upload")[0].split(" Mbyte/s")[0]
 		curr_up = curr_input.split("Upload: ")[1].split(" Mbyte/s")[0]
 
+		#Create Object
 		curr_obj = {
 			"time" : timestamp,
 			"ping" : curr_ping,
@@ -72,29 +98,40 @@ def main():
 		}
 
 		
-
-
+		#If first run initialize the file
 		if curr_run == 0:
-			curr_results = []
-			curr_results.append(curr_obj)
+			curr_write = '[\n' + json.dumps(curr_obj, sort_keys=True, indent=4, separators=(',', ': ')) +'\n]'
+			# result_file.write(bytes(curr_write, 'UTF-8'))
+			result_file.write(curr_write)
 
 
+
+		#If not first run add on
 		else:
-			curr_results = json.load(result_file)
-			curr_results.append(curr_obj)
+			result_file.seek(-2, 2)
+			curr_write = ',\n' + json.dumps(curr_obj, sort_keys=True, indent=4, separators=(',', ': ')) +'\n]'
+			# result_file.write(bytes(curr_write, 'UTF-8'))
+			result_file.write(curr_write)
 
-		write_obj = json.dumps(curr_results, indent=4)
-		result_file.seek(0)
-		result_file.write(write_obj)
 
+		after_time = time()
+
+		elapsed_time = after_time - before_time
+		wait_time = 60 * freq - elapsed_time
+		
 		curr_run += 1
 		
-		# result_file.seek(-3, 2)
-		# print(result_file.read())	
-		# results = json.load(result_file)
-		# results.append(curr_obj)
+		# print("sleeping for: ", wait_time)
+		print(elapsed_time)
+		if number_of_runs == curr_run:
+			print(wait_time)
+			sleep(wait_time)
 
-		# result_file.write((json.dumps(results, indent=4)))
+
+
+
+	#Now we are done, print
+	os.system('say "The scan has finished"')
 		
 	
 
@@ -104,3 +141,29 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
