@@ -20,7 +20,7 @@ class Client:
 		command_length = len(command[1])
 		self.connection.send(struct.pack("I", command_length))
 		self.connection.send(command[1])
-		print("Sending command of size ", command_length)
+		print("Sending request of size ", command_length)
 		
 		response_size_buf = self.connection.recv(LENGTH_SIZE)
 		response_size = struct.unpack("I", response_size_buf)[0]

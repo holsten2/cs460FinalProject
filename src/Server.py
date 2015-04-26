@@ -44,7 +44,7 @@ class Server:
 			msg_len = struct.unpack("I", data)[0]
 			msg = conn.recv(msg_len)
 
-			print("Received command of size ", msg_len)
+			print("Received request of size ", msg_len)
 			
 			response = self.find_response(index)
 			conn.send(struct.pack( "I", len(response) ))
