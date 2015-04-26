@@ -1,34 +1,59 @@
 from ProtocolParser import *
 import time
 import socket
+import struct
+import threading
 
 PROTOCOLS_SPEC_FILE = '../protocols.spec'
 
 TCP_IP 		= '0.0.0.0'
 TCP_PORT 	= 1235
-LENGTH_SIZE = 64
+LENGTH_SIZE = 4
 
 class Server:
 
 	def __init__(self):
-		self.parser = ProtocolParser('BitTorrent');
-		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE);
+		self.parser = ProtocolParser('BitTorrent')
+		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE)
 
-	def replay_commands(self):
-		for command in self.commands:
-			if(command[0] == 'server'):
-				print("Performing server command")
-			else:
-				time.sleep(3)
 	def listen(self):
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.socket.bind((TCP_IP, TCP_PORT))
 		self.socket.listen(1)
-		conn, addr = self.socket.accept()
-		data = conn.recv(LENGTH_SIZE)
-		print ("received data:", data.decode("utf-8", "strict"))
-		#conn.send(data)  # echo
+		while True:
+			conn, addr = self.socket.accept()
+			handler = threading.Thread(target=self.handle_connection, args=(conn, addr) )
+			handler.daemon = False
+			handler.start()
 		conn.close()
+
+	def find_response(self, current_index):
+
+		for index in range(current_index, len(self.commands)):
+			if self.commands[index][0] == 'server':
+				return self.commands[index][1]
+
+
+	def handle_connection(self, conn, addr):
+		index = 1
+		while True:
+			
+			data = conn.recv(LENGTH_SIZE)
+			if len(data) == 0:
+				return
+			msg_len = struct.unpack("I", data)[0]
+			msg = conn.recv(msg_len)
+
+			print("Received command of size ", msg_len)
+			
+			response = self.find_response(index)
+			conn.send(struct.pack( "I", len(response) ))
+			conn.send(response)
+
+			print("Replying with response of size ", len(response))
+
+			index += 2
+
 
 
 c = Server();
