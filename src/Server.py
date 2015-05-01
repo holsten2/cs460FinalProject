@@ -13,11 +13,11 @@ LENGTH_SIZE = 4
 
 class Server:
 
-	def __init__(self):
+	def __init__(self, protocol):
 		if len(sys.argv) < 2:
 			print ("Usage: Server.py protocol")
 			sys.exit(0)
-		self.parser = ProtocolParser(sys.argv[1])
+		self.parser = ProtocolParser(protocol)
 		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE)
 
 	def listen(self):
@@ -60,6 +60,6 @@ class Server:
 
 
 
-c = Server();
+c = Server(sys.argv[1]);
 c.listen()
 
