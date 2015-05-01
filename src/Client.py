@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from ProtocolParser import *
 import time
 import socket
