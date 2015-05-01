@@ -18,6 +18,7 @@ class Client:
 		if len(sys.argv) < 2:
 			print ("Usage: Client.py protocol")
 			sys.exit(0)
+		self.protocol = protocol
 		self.parser = ProtocolParser(protocol)
 		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE)
 
@@ -45,6 +46,17 @@ class Client:
 	def replay_commands(self):
 		self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.connection.connect((SERVER_IP, SERVER_PORT))
+
+		print("Sending protocol request to server to use ", self.protocol)
+
+		self.connection.send(struct.pack("I", len(self.protocol.encode('utf-8'))) )
+		self.connection.send(self.protocol.encode('utf-8'))
+		protocol_response = self.connection.recv(2)
+		
+		if protocol_response.decode('utf-8') == "OK":
+			print ("Server acknowledged protocol request")
+
+
 		total_size = 0
 		total_time = 0.0
 		for index, command in enumerate(self.commands):
