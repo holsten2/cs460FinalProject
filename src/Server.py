@@ -3,6 +3,7 @@ import time
 import socket
 import struct
 import threading
+import sys
 
 PROTOCOLS_SPEC_FILE = '../protocols.spec'
 
@@ -13,7 +14,10 @@ LENGTH_SIZE = 4
 class Server:
 
 	def __init__(self):
-		self.parser = ProtocolParser('BitTorrent')
+		if len(sys.argv) < 2:
+			print ("Usage: Server.py protocol")
+			sys.exit(0)
+		self.parser = ProtocolParser(sys.argv[1])
 		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE)
 
 	def listen(self):

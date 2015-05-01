@@ -2,6 +2,7 @@ from ProtocolParser import *
 import time
 import socket
 import struct
+import sys
 
 PROTOCOLS_SPEC_FILE = '../protocols.spec'
 
@@ -13,7 +14,10 @@ BUFFER_SIZE = 1024
 class Client:
 
 	def __init__(self):
-		self.parser = ProtocolParser('BitTorrent')
+		if len(sys.argv) < 2:
+			print ("Usage: Client.py protocol")
+			sys.exit(0)
+		self.parser = ProtocolParser(sys.argv[1])
 		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE)
 
 	def send_command(self, command, index):
@@ -44,4 +48,11 @@ class Client:
 
 
 c = Client();
+
+timeBefore = round(time.time()*1000)
 c.replay_commands()
+timeAfter = round(time.time()*1000)
+
+timeSeconds = (timeAfter-timeBefore) / 1000.0
+
+print (timeSeconds, " seconds elapsed")
