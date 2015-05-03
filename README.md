@@ -11,7 +11,7 @@ Configuration Dependencies:\n
 Tools for testing for throttling based on protocol.<br>
 
 To start the server: <br>
-python3 server.py
+python3 Server.py
 
 To perform a test:<br>
 Edit the SERVER_IP and SERVER_PORT variables in Client.py to point to the running server
