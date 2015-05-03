@@ -8,17 +8,17 @@ Configuration Dependencies:\n
 	A file called results.json\n
 
 #Client Server
-Tools for testing for throttling based on protocol.
+Tools for testing for throttling based on protocol.<br>
 
-To start the server:
+To start the server: <br>
 python3 server.py
 
-To perform a test:
+To perform a test:<br>
 Edit the SERVER_IP and SERVER_PORT variables in Client.py to point to the running server
 
-Usage: Client.py [options]
+Usage: Client.py [options]<br>
 
-Options:
-	-h, --help	 			show the help message and exit
-	-p PROTOCOL, --protocol=PROTOCOL: 	Specify the protocol to use for the test
+Options:<br>
+	-h, --help	 			show the help message and exit<br>
+	-p PROTOCOL, --protocol=PROTOCOL: 	Specify the protocol to use for the test<br>
 	-n TRIALS, --trials=TRIALS: 		Specify the number of trials to use for the test
