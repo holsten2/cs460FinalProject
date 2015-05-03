@@ -5,10 +5,11 @@ import socket
 import struct
 import sys
 import json
+from optparse import OptionParser
 
 PROTOCOLS_SPEC_FILE = '../protocols.spec'
 
-SERVER_IP = '0.0.0.0'
+SERVER_IP = '52.11.186.220'
 SERVER_PORT = 1235
 LENGTH_SIZE = 4
 BUFFER_SIZE = 1048576
@@ -71,13 +72,26 @@ class Client:
 
 
 
-c = Client(sys.argv[1]);
+total_time = 0
+total_size = 0
 
-stats = c.replay_commands()
+parser = OptionParser()
 
-total_size = stats[0]
-total_time = stats[1]
+parser.add_option("-p", "--protocol", dest="protocol",
+                  help="Specify the protocol to use for the test")
+
+parser.add_option("-n", "--trials", dest="trials", default="1",
+                  help="Specify the number of trials to use for the test")
+(options, args) = parser.parse_args()
+
+
+for i in range(0,int(options.trials)):
+	c = Client(options.protocol);
+
+	stats = c.replay_commands()
+
+	total_size += stats[0]
+	total_time += stats[1]
 
 kbps = ( (stats[0] / 1000.0) / total_time)
-
 print ( json.dumps({"protocol": sys.argv[1], "total_time": total_time, "total_size": total_size, "KB/S": kbps}))
