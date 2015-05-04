@@ -7,10 +7,11 @@ import sys
 import json
 from optparse import OptionParser
 import os
+from scipy import stats 
 
 PROTOCOLS_SPEC_FILE = '../protocols.spec'
 
-SERVER_IP = '0.0.0.0'
+SERVER_IP = '52.11.186.220'
 SERVER_PORT = 1235
 LENGTH_SIZE = 4
 BUFFER_SIZE = 1048576
@@ -27,9 +28,10 @@ class Client:
 
 	def send_command(self, command, index):
 		command_length = len(command)
+		print("Sending request of size ", command_length)
 		self.connection.send(struct.pack("I", command_length))
 		self.connection.send(command)
-		print("Sending request of size ", command_length)
+		
 		
 		response_size_buf = self.connection.recv(LENGTH_SIZE)
 		response_size = struct.unpack("I", response_size_buf)[0]
@@ -71,7 +73,7 @@ class Client:
 		for index, command in enumerate(self.commands):
 			if(command[0] == 'client'):
 				if(randomize):
-					curr_stats = self.send_command( os.urandom(len(command) ), index)
+					curr_stats = self.send_command( os.urandom(len(command[1]) ), index)
 				else:	
 					curr_stats = self.send_command(command[1], index)
 				total_size += curr_stats[0]
@@ -80,21 +82,20 @@ class Client:
 
 		return (total_size, total_time)
 
-def testProtocol(randomize):
-	total_time = 0
-	total_size = 0
+def kilobytes_per_second(num_bytes, seconds):
+	return ((num_bytes / 1000.0) / seconds)	
 
+def average(list):
+	return sum(list)/float(len(list))
+
+def testProtocol(randomize):
+	bandwidth = []
 	for i in range(0,int(options.trials)):
 		c = Client(options.protocol);
-
 		stats = c.replay_commands(randomize)
+		bandwidth.append(kilobytes_per_second(stats[0], stats[1]))
 
-		total_size += stats[0]
-		total_time += stats[1]
-
-	kbps = ( (stats[0] / 1000.0) / total_time)
-	protocol_results_json = json.dumps({"protocol": options.protocol, "total_time": total_time, "total_size": total_size, "KB/S": kbps, "random_bytes": randomize})	
-	return protocol_results_json
+	return bandwidth
 
 
 
@@ -107,7 +108,20 @@ parser.add_option("-n", "--trials", dest="trials", default="1",
                   help="Specify the number of trials to use for the test")
 (options, args) = parser.parse_args()
 
-print ( testProtocol(False) );
-print ( testProtocol(True) );
+protocol_sample = testProtocol(False)
+control_sample = testProtocol(True)
+
+average_protocol_bandwidth = average(protocol_sample)*8.0
+average_random_bandwidth = average(control_sample)*8.0
+
+print("Summary of testing:")
+print ("Average bandwidth using "+options.protocol+": "+str(average_protocol_bandwidth)+" Kbit/s")
+print ("Average bandwidth using random bytes: "+str(average_random_bandwidth)+" Kbit/s")
+
+t_test_results = stats.ttest_ind(protocol_sample, control_sample, equal_var=False)
+if( (t_test_results[0] < 0) and ( abs(t_test_results[0]) > t_test_results[1]) ):
+	print ("Throttling detected. Difference in average bandwidth is statistically significant.")
+else:
+	print ("Throttling not detected. Difference in average bandwidth is not statistically significant.")
 
 
