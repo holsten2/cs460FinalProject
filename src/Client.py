@@ -21,7 +21,7 @@ class Client:
 
 	def __init__(self, protocol):
 		if len(sys.argv) < 2:
-			print ("Usage: Client.py protocol")
+			print ("Usage: Client.py -n trials -p  protocol")
 			sys.exit(0)
 		self.protocol = protocol
 		self.parser = ProtocolParser(protocol)
@@ -102,7 +102,7 @@ def testProtocol(randomize):
 
 parser = OptionParser()
 
-parser.add_option("-p", "--protocol", dest="protocol",
+parser.add_option("-p", "--protocol", dest="protocol", default="HTTP",
                   help="Specify the protocol to use for the test")
 
 parser.add_option("-n", "--trials", dest="trials", default="1",
