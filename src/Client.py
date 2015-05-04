@@ -6,10 +6,11 @@ import struct
 import sys
 import json
 from optparse import OptionParser
+import os
 
 PROTOCOLS_SPEC_FILE = '../protocols.spec'
 
-SERVER_IP = '52.11.186.220'
+SERVER_IP = '0.0.0.0'
 SERVER_PORT = 1235
 LENGTH_SIZE = 4
 BUFFER_SIZE = 1048576
@@ -25,9 +26,9 @@ class Client:
 		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE)
 
 	def send_command(self, command, index):
-		command_length = len(command[1])
+		command_length = len(command)
 		self.connection.send(struct.pack("I", command_length))
-		self.connection.send(command[1])
+		self.connection.send(command)
 		print("Sending request of size ", command_length)
 		
 		response_size_buf = self.connection.recv(LENGTH_SIZE)
@@ -45,14 +46,20 @@ class Client:
 			print ("Received corrupted response of size ", len(response))
 		return (len(response), timeSeconds)
 
-	def replay_commands(self):
+	def replay_commands(self, randomize):
 		self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.connection.connect((SERVER_IP, SERVER_PORT))
 
-		print("Sending protocol request to server to use ", self.protocol)
+		if randomize:
+			print("Sending protocol request to server to use random bytes to compare with ", self.protocol)
+		else:
+			print("Sending protocol request to server to use ", self.protocol)
 
 		self.connection.send(struct.pack("I", len(self.protocol.encode('utf-8'))) )
 		self.connection.send(self.protocol.encode('utf-8'))
+
+		self.connection.send(struct.pack("?", randomize))
+
 		protocol_response = self.connection.recv(2)
 		
 		if protocol_response.decode('utf-8') == "OK":
@@ -63,17 +70,33 @@ class Client:
 		total_time = 0.0
 		for index, command in enumerate(self.commands):
 			if(command[0] == 'client'):
-				curr_stats = self.send_command(command, index)
+				if(randomize):
+					curr_stats = self.send_command( os.urandom(len(command) ), index)
+				else:	
+					curr_stats = self.send_command(command[1], index)
 				total_size += curr_stats[0]
 				total_time += curr_stats[1]
 		self.connection.close()
 
 		return (total_size, total_time)
 
+def testProtocol(randomize):
+	total_time = 0
+	total_size = 0
+
+	for i in range(0,int(options.trials)):
+		c = Client(options.protocol);
+
+		stats = c.replay_commands(randomize)
+
+		total_size += stats[0]
+		total_time += stats[1]
+
+	kbps = ( (stats[0] / 1000.0) / total_time)
+	protocol_results_json = json.dumps({"protocol": options.protocol, "total_time": total_time, "total_size": total_size, "KB/S": kbps, "random_bytes": randomize})	
+	return protocol_results_json
 
 
-total_time = 0
-total_size = 0
 
 parser = OptionParser()
 
@@ -84,14 +107,7 @@ parser.add_option("-n", "--trials", dest="trials", default="1",
                   help="Specify the number of trials to use for the test")
 (options, args) = parser.parse_args()
 
+print ( testProtocol(False) );
+print ( testProtocol(True) );
 
-for i in range(0,int(options.trials)):
-	c = Client(options.protocol);
 
-	stats = c.replay_commands()
-
-	total_size += stats[0]
-	total_time += stats[1]
-
-kbps = ( (stats[0] / 1000.0) / total_time)
-print ( json.dumps({"protocol": sys.argv[1], "total_time": total_time, "total_size": total_size, "KB/S": kbps}))
