@@ -15,6 +15,7 @@ SERVER_IP = '52.11.186.220'
 SERVER_PORT = 1235
 LENGTH_SIZE = 4
 BUFFER_SIZE = 1048576
+P_VALUE_THRESHOLD = 0.05
 
 class Client:
 
@@ -119,7 +120,7 @@ print ("Average bandwidth using "+options.protocol+": "+str(average_protocol_ban
 print ("Average bandwidth using random bytes: "+str(average_random_bandwidth)+" Kbit/s")
 
 t_test_results = stats.ttest_ind(protocol_sample, control_sample, equal_var=False)
-if( (t_test_results[0] < 0) and ( abs(t_test_results[0]) > t_test_results[1]) ):
+if( (t_test_results[0] < 0) and ( t_test_results[1] < P_VALUE_THRESHOLD) ):
 	print ("Throttling detected. Difference in average bandwidth is statistically significant.")
 else:
 	print ("Throttling not detected. Difference in average bandwidth is not statistically significant.")
