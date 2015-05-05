@@ -17,9 +17,7 @@ Configuration Dependencies:<br>
 **Defaults:** <br>
 
 Default Duration = 0 and Frequency = 0 (exactly one run) <br>
-
 Duration = 0 will result in a single run done.<br>
-
 Frequency = 0 will result in non stop tests for the duration. <br>
 
 
