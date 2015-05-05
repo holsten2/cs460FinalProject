@@ -6,15 +6,15 @@ Configuration Dependencies:<br>
 	**speedtestcli** -- https://github.com/sivel/speedtest-cli <br>
 	**pyplot** -- http://matplotlib.org/api/pyplot_api.html <br>
 
-Usage: netstat.py [options]<br>
+**Usage:** netstat.py [options]<br>
 
-Options:<br>
+**Options:**<br>
  	 -h, --help            show this help message and exit<br>
  	 -d DURATION, --duration=DURATION Duration of bandwidth test in hours<br>
   	 -f FREQ, --freq=FREQ  Frequency of tests in minutes<br>
 
 
-Defaults: <br>
+**Defaults:** <br>
 
 Default Duration = 0 and Frequency = 0 (exactly one run) <br>
 
