@@ -2,7 +2,7 @@
 
 ### Netstat.py
 
-##### Configuration Dependencies:
+Configuration Dependencies:
 	**speedtestcli** -- https://github.com/sivel/speedtest-cli <br>
 	**pyplot** -- http://matplotlib.org/api/pyplot_api.html <br>
 
