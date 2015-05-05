@@ -1,11 +1,27 @@
-# cs460FinalProject
-Final Project for CS460
+# Statistical Network Analysis
 
-Configuration Dependencies:\n
-	speedtestcli\n
-	pyplot\n
-	numpy\n
-	A file called results.json\n
+### Netstat.py
+
+##### Configuration Dependencies:\n
+	**speedtestcli** -- https://github.com/sivel/speedtest-cli\n
+	**pyplot** -- http://matplotlib.org/api/pyplot_api.html\n
+
+Usage: netstat.py [options]<br>
+
+Options:<br>
+  -h, --help            show this help message and exit<br>
+  -d DURATION, --duration=DURATION<br>
+                        Duration of bandwidth test in hours<br>
+  -f FREQ, --freq=FREQ  Frequency of tests in minutes<br>
+
+
+
+
+
+
+
+
+
 
 #Client Server
 Tools for testing for throttling based on protocol.<br>

@@ -6,15 +6,12 @@ from subprocess import * #Making system calls
 from time import *
 import json
 import os
-
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as pltd
 from datetime import datetime
 
 
-#TODO:
-#MAKE RESULTS.JSON ON CONFIG ==> "[]"
+
 def plot_information(in_time, test_dir):
 	result_file = open(test_dir + in_time + "results.json", "r")
 	plot_data = result_file.read()
@@ -117,9 +114,6 @@ def plot_information(in_time, test_dir):
 
 
 def main():
-	# if(len(sys.argv) < 2):
-	# 	print("PASS PARAMATER PLS")
-	# 	sys.exit(0)
 
 	parser = OptionParser()
 	parser.add_option("-d", "--duration", dest="duration",
@@ -151,14 +145,6 @@ def main():
 	output_file = "current_test"
 	args1 = "--bytes"
 	args2 = "--simple"
-
-	# process_worker = os.fork()
-	# if process_worker != 0:
-	# 	print("Executing scan on PID: ", process_worker)
-	# 	finish_time = time() + (duration * 60 * 60)
-	# 	print_time = strftime('%H:%M, %Y-%m-%d', localtime(finish_time))
-	# 	print("Approximate time scan will finish: ", print_time)
-	# 	exit(0)
 
 	print "Executing scan on PID: " + str(os.getpid())
 	finish_time = time() + (duration * 60 * 60)
