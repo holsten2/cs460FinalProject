@@ -16,7 +16,7 @@ Options:<br>
 
 Defaults: <br>
 
-Default Duration = 0 and Frequency = 0 (exactly one run)
+Default Duration = 0 and Frequency = 0 (exactly one run) <br>
 
 Duration = 0 will result in a single run done.<br>
 
