@@ -2,16 +2,16 @@
 
 ### Netstat.py
 
-##### Configuration Dependencies:\n
-	**speedtestcli** -- https://github.com/sivel/speedtest-cli\n
-	**pyplot** -- http://matplotlib.org/api/pyplot_api.html\n
+##### Configuration Dependencies:
+	**speedtestcli** -- https://github.com/sivel/speedtest-cli <br>
+	**pyplot** -- http://matplotlib.org/api/pyplot_api.html <br>
 
 Usage: netstat.py [options]<br>
 
 Options:<br>
-  -h, --help            show this help message and exit<br>
-  -d DURATION, --duration=DURATION<br>
-                        Duration of bandwidth test in hours<br>
+ 	 -h, --help            show this help message and exit<br>
+ 	 -d DURATION, --duration=DURATION<br>
+ 	                       Duration of bandwidth test in hours<br>
   -f FREQ, --freq=FREQ  Frequency of tests in minutes<br>
 
 
