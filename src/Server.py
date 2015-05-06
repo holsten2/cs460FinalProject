@@ -12,6 +12,7 @@ TCP_IP 		= '0.0.0.0'
 TCP_PORT 	= 1235
 LENGTH_SIZE = 4
 
+#TODO: ADD RANDOMIZED BITS
 class Server:
 
 	def __init__(self):
@@ -36,7 +37,10 @@ class Server:
 
 		for index in range(current_index, len(self.commands)):
 			if self.commands[index][0] == 'server':
-				return self.commands[index][1]
+				if self.randomize_bytes:
+					return urandom(len(self.commands[index][1]))
+				else:
+					return self.commands[index][1]
 
 	def handle_protocol_request(self, conn, addr):
 		data = conn.recv(LENGTH_SIZE)
@@ -48,6 +52,8 @@ class Server:
 		print("Received protocol request to use ", msg.decode('utf-8'))
 		self.parser = ProtocolParser(msg.decode('utf-8'))
 		self.commands = self.parser.parse_commands_from_file(PROTOCOLS_SPEC_FILE)
+
+		self.randomize_bytes = bool(struct.unpack("?", conn.recv(1))[0] )
 
 		response = "OK"
 		conn.send(struct.pack("s", response.encode('utf-8')))
