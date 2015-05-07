@@ -27,7 +27,7 @@ Frequency = 0 will result in non stop tests for the duration. <br>
 
 
 
-#Client Server
+#Protocol Analysis
 Tools for testing for throttling based on protocol.<br>
 
 To start the server: <br>
